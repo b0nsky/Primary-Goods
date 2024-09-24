@@ -1,5 +1,5 @@
-import AddToWishlist from '@/components/AddToWishlist';
 import React from 'react';
+import AddToWishlist from '@/components/AddToWishlist';
 
 const product = {
   name: 'Product 1',

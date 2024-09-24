@@ -1,7 +1,8 @@
-"use client"
+"use client"; 
+
 import React from 'react';
 import { useRouter } from 'next/navigation'; 
-import { AiFillStar } from 'react-icons/ai'; 
+import AddToWishlist from '@/components/AddToWishlist';  
 
 const ListProduct = () => {
   const router = useRouter();
@@ -17,12 +18,8 @@ const ListProduct = () => {
     { id: 8, name: 'Product 8', price: '$240', slug: 'product-8' },
   ];
 
-  const handleWishlist = () => {
-    router.push('/wishlist');
-  };
-
   const handleProductClick = (slug: string) => {
-    router.push(`/products/${slug}`);
+    router.push(`/products/${slug}`);  
   };
 
   return (
@@ -40,13 +37,9 @@ const ListProduct = () => {
               onClick={() => handleProductClick(product.slug)}
             />
 
-            <button
-              className="absolute top-2 right-2 bg-blue-500 text-white p-1 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-              aria-label="Add to Wishlist"
-              onClick={handleWishlist}
-            >
-              <AiFillStar className="w-5 h-5" />
-            </button>
+            <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+              <AddToWishlist />
+            </div>
           </div>
 
           <h3 className="text-lg font-semibold mt-4">{product.name}</h3>
