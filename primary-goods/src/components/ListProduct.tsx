@@ -1,25 +1,30 @@
-"use client"; 
-
+"use client"
 import React from 'react';
-import { useRouter } from 'next/navigation'; 
-import AddToWishlist from '@/components/AddToWishlist';  
+import AddToWishlist from '@/components/AddToWishlist';
 
-const ListProduct = () => {
-  const router = useRouter();
+interface Product {
+  id: number;
+  name: string;
+  price: number | string;
+  slug: string;
+  thumbnail: string;
+}
 
-  const products = [
-    { id: 1, name: 'Product 1', price: '$100', slug: 'product-1' },
-    { id: 2, name: 'Product 2', price: '$120', slug: 'product-2' },
-    { id: 3, name: 'Product 3', price: '$140', slug: 'product-3' },
-    { id: 4, name: 'Product 4', price: '$160', slug: 'product-4' },
-    { id: 5, name: 'Product 5', price: '$180', slug: 'product-5' },
-    { id: 6, name: 'Product 6', price: '$200', slug: 'product-6' },
-    { id: 7, name: 'Product 7', price: '$220', slug: 'product-7' },
-    { id: 8, name: 'Product 8', price: '$240', slug: 'product-8' },
-  ];
+const getProducts = async (): Promise<Product[]> => {
+  const res = await fetch('http://localhost:3000/api/products');
+  if (!res.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  const products: Product[] = await res.json();
+  return products;
+};
 
+const ListProduct = async () => {
+  // Ambil data produk dari API
+  const products = await getProducts();
+    console.log(products)
   const handleProductClick = (slug: string) => {
-    router.push(`/products/${slug}`);  
+    window.location.href = `/products/${slug}`;
   };
 
   return (
@@ -31,7 +36,7 @@ const ListProduct = () => {
         >
           <div className="relative">
             <img
-              src="https://i.pinimg.com/564x/55/14/69/5514694b23da5777214fda088b3d57fb.jpg"
+              src={product.thumbnail}
               alt={product.name}
               className="w-full h-64 object-cover rounded-md cursor-pointer"
               onClick={() => handleProductClick(product.slug)}
@@ -42,8 +47,10 @@ const ListProduct = () => {
             </div>
           </div>
 
-          <h3 className="text-lg font-semibold mt-4">{product.name}</h3>
-          <p className="text-gray-500">{product.price}</p>
+          <div className="text-center mt-4">
+            <h3 className="text-lg font-semibold">{product.name}</h3>
+            <p className="text-gray-500 mt-2">$ {product.price}</p>
+          </div>
         </div>
       ))}
     </div>
