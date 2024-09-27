@@ -7,6 +7,7 @@ interface Product {
   name: string;
   price: number | string;
   thumbnail: string;
+  slug: string;
 }
 
 interface ProductSliderProps {
@@ -35,6 +36,10 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
     router.push('/products');
   };
 
+  const handleProductClick = (slug: string) => {
+    router.push(`/products/${slug}`);
+  };
+
   return (
     <div className="relative w-full">
       <button
@@ -56,7 +61,8 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                 <img
                   src={product.thumbnail}
                   alt={product.name}
-                  className="w-full h-64 object-cover rounded-md"
+                  className="w-full h-64 object-cover rounded-md cursor-pointer"
+                  onClick={() => handleProductClick(product.slug)}
                 />
                 <h3 className="text-lg font-semibold mt-4">{product.name}</h3>
                 <p className="text-gray-500">$ {product.price}</p>

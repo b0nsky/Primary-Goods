@@ -1,8 +1,8 @@
 "use client";
-
-import React, { useState, useEffect } from 'react';
-import AddToWishlist from '@/components/AddToWishlist';
+import React from 'react';
 import InfiniteScroll from 'react-infinite-scroll-component';
+import AddToWishlist from '@/components/AddToWishlist';
+import { Spinner } from '@chakra-ui/react';
 import { ObjectId } from 'mongodb';
 
 interface ProductType {
@@ -14,44 +14,24 @@ interface ProductType {
   excerpt: string;
 }
 
-const getProducts = async (page: number, limit: number): Promise<ProductType[]> => {
-  const res = await fetch(`/api/products?page=${page}&limit=${limit}`);
-  if (!res.ok) {
-    throw new Error('Failed to fetch products');
-  }
-  return res.json();
-};
+interface ListProductProps {
+  products: ProductType[];
+  hasMore: boolean;
+  loadMoreProducts: () => void;
+  loading: boolean;
+}
 
-const ListProduct = ({ userId }: { userId: string }) => {
-  const [products, setProducts] = useState<ProductType[]>([]);
-  const [page, setPage] = useState(1);
-  const [hasMore, setHasMore] = useState(true);
-
-  const loadMoreProducts = async () => {
-    try {
-      const newProducts = await getProducts(page, 10);
-      if (newProducts.length === 0) {
-        setHasMore(false);
-      } else {
-        setProducts((prevProducts) => [...prevProducts, ...newProducts]);
-        setPage((prevPage) => prevPage + 1);
-      }
-    } catch (error) {
-      console.error('Error fetching products:', error);
-      setHasMore(false);
-    }
-  };
-
-  useEffect(() => {
-    loadMoreProducts();
-  }, []);
-
+const ListProduct: React.FC<ListProductProps> = ({ products, hasMore, loadMoreProducts, loading }) => {
   return (
     <InfiniteScroll
       dataLength={products.length}
       next={loadMoreProducts}
       hasMore={hasMore}
-      loader={<div className="col-span-full text-center">Loading...</div>}
+      loader={
+        <div className="col-span-full text-center">
+          {loading && <Spinner size="xl" color="blue.500" />}
+        </div>
+      }
       endMessage={<div className="col-span-full text-center">No more products</div>}
       className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
     >
@@ -69,7 +49,7 @@ const ListProduct = ({ userId }: { userId: string }) => {
             />
 
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <AddToWishlist productId={product._id.toString()} userId={userId} />
+              <AddToWishlist productId={product._id.toString()} />
             </div>
           </div>
 

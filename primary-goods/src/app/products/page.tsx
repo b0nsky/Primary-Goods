@@ -1,32 +1,89 @@
 "use client";
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import ListProduct from '@/components/ListProduct';
-import { jwtDecode } from 'jwt-decode';
+import { ObjectId } from 'mongodb';
+import SearchBar from '@/components/Search';
+
+interface ProductType {
+  _id: ObjectId;
+  name: string;
+  price: number;
+  slug: string;
+  thumbnail: string;
+  excerpt: string;
+}
+
+const getProducts = async (page: number, limit: number, search: string): Promise<ProductType[]> => {
+  const res = await fetch(`/api/products?page=${page}&limit=${limit}&search=${search}`);
+  if (!res.ok) {
+    throw new Error('Failed to fetch products');
+  }
+  return res.json();
+};
+
+const debounce = (func: Function, delay: number) => {
+  let timeoutId: NodeJS.Timeout;
+  return (...args: any[]) => {
+    clearTimeout(timeoutId);
+    timeoutId = setTimeout(() => func(...args), delay);
+  };
+};
 
 const ProductsPage = () => {
-  const [userId, setUserId] = useState<string | null>(null);
+  const [products, setProducts] = useState<ProductType[]>([]);
+  const [page, setPage] = useState(1);
+  const [hasMore, setHasMore] = useState(true);
+  const [search, setSearch] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+
+  const loadMoreProducts = async () => {
+    setLoading(true); // Aktifkan loading
+    try {
+      const newProducts = await getProducts(page, 10, searchQuery);
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      } else {
+        setProducts((prevProducts) => [...prevProducts, ...newProducts]);
+        setPage((prevPage) => prevPage + 1);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+      setHasMore(false);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleSearch = debounce((value: string) => {
+    setSearchQuery(value);
+    setPage(1);
+    setProducts([]);
+    setHasMore(true);
+  }, 200);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
-    
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        setUserId(decoded.userId);
-      } catch (error) {
-        console.error('Failed to decode token', error);
-      }
+    loadMoreProducts();
+  }, [searchQuery]);
+
+  useEffect(() => {
+    if (search === '') {
+      setSearchQuery('');
+    } else {
+      handleSearch(search);
     }
-  }, []);
+  }, [search]);
 
   return (
     <div className="container mx-auto py-10">
+      <SearchBar search={search} setSearch={setSearch} />
       <h2 className="text-3xl font-bold text-gray-700 mb-6">All Products</h2>
-      {userId ? (
-        <ListProduct userId={userId} />
-      ) : (
-        <p className="text-center">Loading...</p>
-      )}
+      <ListProduct
+        products={products}
+        hasMore={hasMore}
+        loadMoreProducts={loadMoreProducts}
+        loading={loading}
+      />
     </div>
   );
 };
