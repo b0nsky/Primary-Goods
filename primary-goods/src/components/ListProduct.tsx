@@ -1,7 +1,8 @@
 "use client";
 
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import AddToWishlist from '@/components/AddToWishlist';
+import InfiniteScroll from 'react-infinite-scroll-component';
 import { ObjectId } from 'mongodb';
 
 interface ProductType {
@@ -23,15 +24,9 @@ const getProducts = async (page: number, limit: number): Promise<ProductType[]> 
 const ListProduct = () => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [page, setPage] = useState(1);
-  const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const observer = useRef<IntersectionObserver | null>(null);
-  const lastProductRef = useRef<HTMLDivElement | null>(null);
 
   const loadMoreProducts = async () => {
-    if (loading || !hasMore) return;
-    setLoading(true);
-
     try {
       const newProducts = await getProducts(page, 10);
       if (newProducts.length === 0) {
@@ -42,8 +37,7 @@ const ListProduct = () => {
       }
     } catch (error) {
       console.error('Error fetching products:', error);
-    } finally {
-      setLoading(false);
+      setHasMore(false);
     }
   };
 
@@ -51,46 +45,26 @@ const ListProduct = () => {
     loadMoreProducts();
   }, []);
 
-  useEffect(() => {
-    if (loading || !hasMore) return;
-
-    const options = {
-      root: null,
-      rootMargin: '0px',
-      threshold: 1.0,
-    };
-
-    if (observer.current) observer.current.disconnect();
-
-    observer.current = new IntersectionObserver((entries) => {
-      if (entries[0].isIntersecting) {
-        loadMoreProducts();
-      }
-    }, options);
-
-    if (lastProductRef.current) {
-      observer.current.observe(lastProductRef.current);
-    }
-  }, [loading, hasMore]);
-
-  const handleProductClick = (slug: string) => {
-    window.location.href = `/products/${slug}`;
-  };
-
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-      {products.map((product, index) => (
+    <InfiniteScroll
+      dataLength={products.length}
+      next={loadMoreProducts}
+      hasMore={hasMore}
+      loader={<div className="col-span-full text-center">Loading...</div>}
+      endMessage={<div className="col-span-full text-center">No more products</div>}
+      className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
+    >
+      {products.map((product) => (
         <div
           key={product._id.toString()}
           className="bg-white shadow-md rounded-lg p-4 relative group"
-          ref={index === products.length - 1 ? lastProductRef : null}
         >
           <div className="relative">
             <img
               src={product.thumbnail}
               alt={product.name}
               className="w-full h-64 object-cover rounded-md cursor-pointer"
-              onClick={() => handleProductClick(product.slug)}
+              onClick={() => window.location.href = `/products/${product.slug}`}
             />
 
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -104,9 +78,7 @@ const ListProduct = () => {
           </div>
         </div>
       ))}
-      {loading && <div className="col-span-full text-center">Loading...</div>}
-      {!hasMore && <div className="col-span-full text-center">No more products</div>}
-    </div>
+    </InfiniteScroll>
   );
 };
 
