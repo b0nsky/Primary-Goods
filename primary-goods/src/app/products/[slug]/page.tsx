@@ -1,4 +1,3 @@
-// page.tsx (SSR Page)
 import React from 'react';
 import { notFound } from 'next/navigation';
 import AddToWishlist from '@/components/AddToWishlist';
@@ -31,6 +30,22 @@ const getProductBySlug = async (slug: string): Promise<Product | null> => {
     return null;
   }
 };
+
+export async function generateMetadata({ params }: { params: { slug: string } }) {
+  const product = await getProductBySlug(params.slug);
+
+  if (!product) {
+    return {
+      title: 'Product Not Found',
+      description: 'The requested product was not found.',
+    };
+  }
+
+  return {
+    title: `${product.name} - Primary Goods`,
+    description: product.description,
+  };
+}
 
 interface ProductDetailProps {
   params: { slug: string };

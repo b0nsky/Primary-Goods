@@ -16,12 +16,16 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body>
-        <div className="max-w-7xl mx-auto px-4">
-          <Navbar />
+        <div className="fixed top-0 left-0 right-0 bg-white z-50 shadow-lg">
+          <div className="max-w-7xl mx-auto px-4">
+            <Navbar />
+          </div>
         </div>
-        <div className="max-w-7xl mx-auto px-4">
+
+        <div className="pt-16 max-w-7xl mx-auto px-4">
           {children}
         </div>
+        
         <ToastContainer position="top-right" autoClose={3000} hideProgressBar={false} />
       </body>
     </html>
