@@ -1,23 +1,68 @@
 "use client";
 
-import React, { useState } from 'react';
+import { jwtDecode } from 'jwt-decode';
+import React, { useState, useEffect } from 'react';
 import { AiFillStar } from 'react-icons/ai';
+import { toast } from 'react-toastify';
 
 interface AddToWishlistProps {
   productId: string;
+  userId?: string;
 }
 
-const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId }) => {
-  const [addedToWishlist, setAddedToWishlist] = useState(false);
+interface DecodedToken {
+  userId: string;
+}
 
-  const handleWishlist = () => {
-    setAddedToWishlist(true);
-    console.log('Added to wishlist');
+const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId, userId: initialUserId }) => {
+  const [addedToWishlist, setAddedToWishlist] = useState(false);
+  const [userId, setUserId] = useState<string | null>(initialUserId || null);
+
+  useEffect(() => {
+    if (!userId) {
+      const token = localStorage.getItem('token');
+      if (token) {
+        try {
+          const decoded: DecodedToken = jwtDecode(token);
+          setUserId(decoded.userId);
+        } catch (error) {
+          console.error('Failed to decode token', error);
+        }
+      }
+    }
+  }, [userId]);
+
+  const handleWishlist = async () => {
+    if (!userId || !productId) {
+      toast.error('UserId and ProductId are required');
+      return;
+    }
+
+    try {
+      const response = await fetch('/api/wishlists', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ userId, productId }),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        toast.error(errorData.error || 'Failed to add to wishlist');
+        return;
+      }
+
+      setAddedToWishlist(true);
+      toast.success('Added to wishlist');
+    } catch (error) {
+      toast.error('Something went wrong');
+    }
   };
 
   return (
     <button
-      className={`bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300 ${productId}`}
+      className="bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300"
       aria-label="Add to Wishlist"
       onClick={handleWishlist}
     >

@@ -22,7 +22,7 @@ const getProducts = async (page: number, limit: number): Promise<ProductType[]> 
   return res.json();
 };
 
-const ListProduct = () => {
+const ListProduct = ({ userId }: { userId: string }) => {
   const [products, setProducts] = useState<ProductType[]>([]);
   const [page, setPage] = useState(1);
   const [hasMore, setHasMore] = useState(true);
@@ -69,7 +69,7 @@ const ListProduct = () => {
             />
 
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <AddToWishlist productId={product._id.toString()} />
+              <AddToWishlist productId={product._id.toString()} userId={userId} />
             </div>
           </div>
 
