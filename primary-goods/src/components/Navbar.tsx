@@ -1,6 +1,26 @@
-import React from 'react';
+"use client";
+import React, { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
 
 const Navbar = () => {
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem("token");
+    if (token) {
+      setIsLoggedIn(true);
+    } else {
+      setIsLoggedIn(false);
+    }
+  }, []);
+
+  const handleLogout = () => {
+    localStorage.removeItem("token");
+    setIsLoggedIn(false);
+    router.push("/login");
+  };
+
   return (
     <div className="navbar bg-base-100 shadow-lg">
       <div className="navbar-start">
@@ -31,6 +51,11 @@ const Navbar = () => {
             <li>
               <a href="/products">Products</a>
             </li>
+            {isLoggedIn && (
+              <li>
+                <a href="/wishlist">Wishlist</a>
+              </li>
+            )}
           </ul>
         </div>
         <a className="btn btn-ghost normal-case text-xl">Primary Goods</a>
@@ -44,13 +69,27 @@ const Navbar = () => {
           <li>
             <a href="/products">Products</a>
           </li>
+          {isLoggedIn && (
+            <li>
+              <a href="/wishlist">Wishlist</a>
+            </li>
+          )}
         </ul>
       </div>
 
       <div className="navbar-end">
-        <a href="/login" className="btn bg-blue-500 hover:bg-blue-700 text-white">
-          Login
-        </a>
+        {isLoggedIn ? (
+          <button
+            onClick={handleLogout}
+            className="btn bg-red-500 hover:bg-red-700 text-white"
+          >
+            Logout
+          </button>
+        ) : (
+          <a href="/login" className="btn bg-blue-500 hover:bg-blue-700 text-white">
+            Login
+          </a>
+        )}
       </div>
     </div>
   );
