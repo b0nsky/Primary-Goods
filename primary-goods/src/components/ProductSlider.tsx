@@ -59,7 +59,7 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
                   className="w-full h-64 object-cover rounded-md"
                 />
                 <h3 className="text-lg font-semibold mt-4">{product.name}</h3>
-                <p className="text-gray-500">{product.price}</p>
+                <p className="text-gray-500">$ {product.price}</p>
               </div>
             </div>
           ))}

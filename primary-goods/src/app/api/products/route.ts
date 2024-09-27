@@ -1,17 +1,18 @@
 import { NextResponse } from 'next/server';
+import { Product } from '@/models/Product';
 
 export async function GET(request: Request) {
-    const { searchParams } = new URL(request.url);
-    const page = parseInt(searchParams.get('page') || '1');
-    const limit = parseInt(searchParams.get('limit') || '5');
+    try {
+        const { searchParams } = new URL(request.url);
+        const page = parseInt(searchParams.get('page') || '1');
+        const limit = parseInt(searchParams.get('limit') || '10');
+        
+        const start = (page - 1) * limit;
 
-    const res = await fetch('http://localhost:3001/products');
-    const products = await res.json();
+        const products = await Product.findAll({ start, limit });
 
-    const start = (page - 1) * limit;
-    const end = start + limit;
-
-    const paginatedProducts = products.slice(start, end);
-
-    return NextResponse.json(paginatedProducts);
+        return NextResponse.json(products);
+    } catch (error) {
+        return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
+    }
 }

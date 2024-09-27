@@ -4,10 +4,10 @@ import React, { useState } from 'react';
 import { AiFillStar } from 'react-icons/ai';
 
 interface AddToWishlistProps {
-  className?: string;
+  productId: string;
 }
 
-const AddToWishlist: React.FC<AddToWishlistProps> = ({ className }) => {
+const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId }) => {
   const [addedToWishlist, setAddedToWishlist] = useState(false);
 
   const handleWishlist = () => {
@@ -17,7 +17,7 @@ const AddToWishlist: React.FC<AddToWishlistProps> = ({ className }) => {
 
   return (
     <button
-      className={`bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300 ${className}`} // Gabungkan className dengan class default
+      className={`bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300 ${productId}`}
       aria-label="Add to Wishlist"
       onClick={handleWishlist}
     >

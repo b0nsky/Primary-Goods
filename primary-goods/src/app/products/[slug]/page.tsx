@@ -1,9 +1,9 @@
 import React from 'react';
 import { notFound } from 'next/navigation';
-import AddToWishlist from '@/components/AddToWishlist'; // Impor AddToWishlist
+import AddToWishlist from '@/components/AddToWishlist';
 
 interface Product {
-  id: number;
+  _id: string;
   name: string;
   price: number | string;
   description: string;
@@ -15,7 +15,7 @@ interface Product {
 const getProductBySlug = async (slug: string): Promise<Product | null> => {
   const res = await fetch(`http://localhost:3000/api/products`);
   const products: Product[] = await res.json();
-  
+
   const product = products.find((product) => product.slug === slug);
 
   if (!product) {
@@ -38,7 +38,7 @@ const ProductDetailPage = async ({ params }: ProductDetailProps) => {
   }
 
   return (
-    <div className="container mx-auto py-10 px-4 h-screen overflow-hidden">
+    <div className="container mx-auto py-10 px-4 h-screen overflow-y-scroll scrollbar-hide">
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-8">{product.name}</h1>
 
       <div className="flex flex-col lg:flex-row h-full">
@@ -50,19 +50,19 @@ const ProductDetailPage = async ({ params }: ProductDetailProps) => {
           />
 
           {product.images && (
-          <div>
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">Other Images:</h3>
-            <div className="grid grid-cols-2 gap-4">
-              {product.images.map((image, index) => (
-                <img 
-                  key={index} 
-                  src={image} 
-                  alt={`Product Image ${index + 1}`} 
-                  className="w-full h-[200px] object-cover rounded-md"
-                />
-              ))}
+            <div>
+              <h3 className="text-lg font-semibold text-gray-700 mb-2">Other Images:</h3>
+              <div className="grid grid-cols-2 gap-4">
+                {product.images.map((image, index) => (
+                  <img 
+                    key={index} 
+                    src={image} 
+                    alt={`Product Image ${index + 1}`} 
+                    className="w-full h-[200px] object-cover rounded-md"
+                  />
+                ))}
+              </div>
             </div>
-          </div>
           )}
         </div>
 
@@ -73,7 +73,7 @@ const ProductDetailPage = async ({ params }: ProductDetailProps) => {
           <p className="text-lg text-gray-600 mt-4">{product.description}</p>
 
           <div className="mt-6 flex items-center space-x-2">
-            <AddToWishlist className="inline-block bg-blue-500 text-white p-1 rounded-full" />
+            <AddToWishlist productId={product._id}  />
             <span className="text-lg text-gray-700">Add to Wishlist</span>
           </div>
         </div>
