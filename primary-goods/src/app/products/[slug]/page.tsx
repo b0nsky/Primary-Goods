@@ -1,7 +1,7 @@
+// page.tsx (SSR Page)
 import React from 'react';
 import { notFound } from 'next/navigation';
 import AddToWishlist from '@/components/AddToWishlist';
-import { jwtDecode } from 'jwt-decode';
 import { ObjectId } from 'mongodb';
 
 interface Product {
@@ -15,30 +15,21 @@ interface Product {
 }
 
 const getProductBySlug = async (slug: string): Promise<Product | null> => {
-  const res = await fetch(`http://localhost:3000/api/products`);
-  const products: Product[] = await res.json();
+  try {
+    const res = await fetch(`http://localhost:3000/api/products/${slug}`);
 
-  const product = products.find((product) => product.slug === slug);
+    if (!res.ok) {
+      console.error('Failed to fetch product:', res.statusText);
+      return null;
+    }
 
-  if (!product) {
+    const product: Product = await res.json();
+
+    return product || null;
+  } catch (error) {
+    console.error('Error fetching product by slug:', error);
     return null;
   }
-  return product;
-};
-
-const getUserIdFromToken = () => {
-  if (typeof window !== 'undefined') {
-    const token = localStorage.getItem('token');
-    if (token) {
-      try {
-        const decoded: any = jwtDecode(token);
-        return decoded.userId;
-      } catch (error) {
-        console.error('Failed to decode token', error);
-      }
-    }
-  }
-  return null;
 };
 
 interface ProductDetailProps {
@@ -54,7 +45,12 @@ const ProductDetailPage = async ({ params }: ProductDetailProps) => {
     return notFound();
   }
 
-  const userId = getUserIdFromToken();
+  const productIdString = product._id?.toString();
+
+  if (!productIdString) {
+    console.error('Product ID is missing or invalid');
+    return notFound();
+  }
 
   return (
     <div className="container mx-auto py-10 px-4 h-screen overflow-y-scroll scrollbar-hide">
@@ -92,7 +88,7 @@ const ProductDetailPage = async ({ params }: ProductDetailProps) => {
           <p className="text-lg text-gray-600 mt-4">{product.description}</p>
 
           <div className="mt-6 flex items-center space-x-2">
-            <AddToWishlist productId={product._id.toString()} userId={userId} />
+            <AddToWishlist productId={productIdString} />
             <span className="text-lg text-gray-700">Add to Wishlist</span>
           </div>
         </div>
