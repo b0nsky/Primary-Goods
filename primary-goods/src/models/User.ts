@@ -20,4 +20,10 @@ export class User {
     static async findUserByEmail(email: string): Promise<UserType | null> {
         return await usersCollection.findOne({ email });
     }
+
+    static async findOne(emailOrUsername: string): Promise<UserType | null> {
+        return await usersCollection.findOne({
+            $or: [{ email: emailOrUsername }, { username: emailOrUsername }],
+        });
+    }
 }
