@@ -4,9 +4,11 @@ import { ObjectId } from 'mongodb';
 interface ProductType {
   _id: ObjectId;
   name: string;
-  price: number;
   slug: string;
   description: string;
+  excerpt:string,
+  price: number;
+  tags:string[],
   thumbnail: string;
   images: string[];
 }
@@ -14,8 +16,8 @@ interface ProductType {
 const collection = database.collection<ProductType>('products');
 
 export class Product {
-  static async findAll({ start = 0, limit = 10 }: { start: number, limit: number }): Promise<ProductType[]> {
-    return await collection.find()
+  static async findAll({ start = 0, limit = 10, query = {} }: { start: number, limit: number, query?: object }): Promise<ProductType[]> {
+    return await collection.find(query)
       .skip(start)
       .limit(limit)
       .toArray();

@@ -11,6 +11,7 @@ interface ProductType {
   price: number;
   slug: string;
   thumbnail: string;
+  excerpt: string;
 }
 
 const getProducts = async (page: number, limit: number): Promise<ProductType[]> => {
@@ -74,6 +75,7 @@ const ListProduct = () => {
 
           <div className="text-center mt-4">
             <h3 className="text-lg font-semibold">{product.name}</h3>
+            <p className="text-gray-400 mt-2">{product.excerpt}</p>
             <p className="text-gray-500 mt-2">$ {product.price}</p>
           </div>
         </div>
