@@ -1,5 +1,6 @@
-"use client"
-import React from 'react';
+"use client";
+
+import React, { useState, useEffect, useRef } from 'react';
 import AddToWishlist from '@/components/AddToWishlist';
 
 interface Product {
@@ -10,29 +11,71 @@ interface Product {
   thumbnail: string;
 }
 
-const getProducts = async (): Promise<Product[]> => {
-  const res = await fetch('http://localhost:3000/api/products');
+const getProducts = async (page: number, limit: number): Promise<Product[]> => {
+  const res = await fetch(`http://localhost:3000/api/products?page=${page}&limit=${limit}`);
   if (!res.ok) {
     throw new Error('Failed to fetch products');
   }
-  const products: Product[] = await res.json();
-  return products;
+  return res.json();
 };
 
-const ListProduct = async () => {
-  // Ambil data produk dari API
-  const products = await getProducts();
-    console.log(products)
+const ListProduct = () => {
+  const [products, setProducts] = useState<Product[]>([]);
+  const [page, setPage] = useState(1);
+  const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
+
+  const observer = useRef<IntersectionObserver | null>(null);
+  const lastProductRef = useRef<HTMLDivElement | null>(null);
+
+  const loadMoreProducts = async () => {
+    if (loading || !hasMore) return;
+    setLoading(true);
+
+    try {
+      const newProducts = await getProducts(page, 5);
+      if (newProducts.length === 0) {
+        setHasMore(false);
+      } else {
+        setProducts((prevProducts) => [...prevProducts, ...newProducts]);
+        setPage((prevPage) => prevPage + 1);
+      }
+    } catch (error) {
+      console.error('Error fetching products:', error);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadMoreProducts();
+  }, []);
+
+  useEffect(() => {
+    if (loading || !hasMore) return;
+
+    if (observer.current) observer.current.disconnect();
+
+    observer.current = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        loadMoreProducts();
+      }
+    });
+
+    if (lastProductRef.current) observer.current.observe(lastProductRef.current);
+  }, [loading, hasMore]);
+
   const handleProductClick = (slug: string) => {
     window.location.href = `/products/${slug}`;
   };
 
   return (
     <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6">
-      {products.map((product) => (
+      {products.map((product, index) => (
         <div
           key={product.id}
           className="bg-white shadow-md rounded-lg p-4 relative group"
+          ref={index === products.length - 1 ? lastProductRef : null}
         >
           <div className="relative">
             <img
@@ -53,6 +96,8 @@ const ListProduct = async () => {
           </div>
         </div>
       ))}
+      {loading && <div>Loading...</div>}
+      {!hasMore && <div className="text-center">No more products</div>}
     </div>
   );
 };
