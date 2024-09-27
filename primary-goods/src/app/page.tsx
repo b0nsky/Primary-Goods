@@ -1,6 +1,7 @@
 import Banner from '@/components/Banner';
 import DetailInfoEcommerce from '@/components/DetailInfo';
 import FeaturedProduct from '@/components/FeaturedProduct';
+import Navbar from '@/components/Navbar';
 import React from 'react';
 
 interface Product {
@@ -23,11 +24,14 @@ const HomePage = async () => {
   const products = await getProducts();
 
   return (
-    <div className="container mx-auto py-10">
-      <Banner />
-      <h2 className="text-3xl font-bold text-gray-700 mb-6">Featured Products</h2>
-      <FeaturedProduct products={products} />
-      <DetailInfoEcommerce />
+    <div className="container mx-auto py-10" >
+      <div className='mb-10'>
+        <Navbar />
+      </div>
+        <Banner/>
+        <h2 className="text-3xl font-bold text-gray-700 mb-6">Featured Products</h2>
+        <FeaturedProduct products={products} />
+        <DetailInfoEcommerce />
     </div>
   );
 };
