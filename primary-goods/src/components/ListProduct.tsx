@@ -10,8 +10,8 @@ interface ProductType {
   name: string;
   price: number;
   slug: string;
-  thumbnail: string;
-  excerpt: string;
+  thumbnail?: string;
+  excerpt?: string;
 }
 
 interface ListProductProps {
@@ -41,12 +41,16 @@ const ListProduct: React.FC<ListProductProps> = ({ products, hasMore, loadMorePr
           className="bg-white shadow-md rounded-lg p-4 relative group"
         >
           <div className="relative">
-            <img
-              src={product.thumbnail}
-              alt={product.name}
-              className="w-full h-64 object-cover rounded-md cursor-pointer"
-              onClick={() => window.location.href = `/products/${product.slug}`}
-            />
+            {product.thumbnail ? (
+              <img
+                src={product.thumbnail}
+                alt={product.name}
+                className="w-full h-64 object-cover rounded-md cursor-pointer"
+                onClick={() => window.location.href = `/products/${product.slug}`}
+              />
+            ) : (
+              <div className="w-full h-64 bg-gray-200 rounded-md"></div>
+            )}
 
             <div className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <AddToWishlist productId={product._id.toString()} />
@@ -55,7 +59,7 @@ const ListProduct: React.FC<ListProductProps> = ({ products, hasMore, loadMorePr
 
           <div className="text-center mt-4">
             <h3 className="text-lg font-semibold">{product.name}</h3>
-            <p className="text-gray-400 mt-2">{product.excerpt}</p>
+            {product.excerpt && <p className="text-gray-400 mt-2">{product.excerpt}</p>}
             <p className="text-gray-500 mt-2">$ {product.price}</p>
           </div>
         </div>

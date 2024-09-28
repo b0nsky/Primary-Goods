@@ -5,13 +5,11 @@ import { toast } from 'react-toastify';
 
 const RegisterPage = () => {
   const router = useRouter();
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
 
   const handleRegister = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setLoading(true);
-    setErrorMessage(null);
 
     const formData = new FormData(e.currentTarget);
     const name = formData.get('name') as string;
@@ -34,17 +32,27 @@ const RegisterPage = () => {
         toast.success('Successfully registered!', {
           style: { backgroundColor: 'green', color: 'white' },
         });
-        
+
         setTimeout(() => {
           router.push('/login');
         }, 3000);
       } else {
-        setErrorMessage(data.message || 'Failed to register');
-        toast.error(data.message || 'Failed to register');
+        if (Array.isArray(data.message)) {
+          data.message.forEach((errorMessage: string) => {
+            toast.error(errorMessage, {
+              style: { backgroundColor: 'red', color: 'white' },
+            });
+          });
+        } else {
+          toast.error(data.message || 'Failed to register', {
+            style: { backgroundColor: 'red', color: 'white' },
+          });
+        }
       }
     } catch (error) {
-      setErrorMessage('An unexpected error occurred');
-      toast.error('An unexpected error occurred');
+      toast.error('An unexpected error occurred', {
+        style: { backgroundColor: 'red', color: 'white' },
+      });
     } finally {
       setLoading(false);
     }
@@ -91,12 +99,6 @@ const RegisterPage = () => {
             {loading ? 'Registering...' : 'Register'}
           </button>
         </form>
-
-        {errorMessage && (
-          <div className="mt-4 text-red-500 text-center">
-            {errorMessage}
-          </div>
-        )}
       </div>
     </div>
   );

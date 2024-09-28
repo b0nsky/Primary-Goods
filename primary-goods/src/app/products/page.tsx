@@ -1,16 +1,16 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import ListProduct from '@/components/ListProduct';
-import { ObjectId } from 'mongodb';
 import SearchBar from '@/components/Search';
+import { ObjectId } from 'mongodb';
 
 interface ProductType {
   _id: ObjectId;
   name: string;
   price: number;
   slug: string;
-  thumbnail: string;
-  excerpt: string;
+  thumbnail?: string;
+  excerpt?: string;
 }
 
 const getProducts = async (page: number, limit: number, search: string): Promise<ProductType[]> => {
@@ -38,7 +38,7 @@ const ProductsPage = () => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const loadMoreProducts = async () => {
-    setLoading(true); // Aktifkan loading
+    setLoading(true);
     try {
       const newProducts = await getProducts(page, 10, searchQuery);
       if (newProducts.length === 0) {
