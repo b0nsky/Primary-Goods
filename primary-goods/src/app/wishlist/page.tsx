@@ -62,11 +62,11 @@ const WishlistPage = () => {
       <h1 className="text-4xl font-bold text-center text-gray-800 mb-12">Your Wishlist</h1>
 
       {products.length === 0 ? (
-        <p className="text-center text-gray-600">You don't have any wishlist</p>
+        <p className="text-center text-gray-600">{"You don't have any wishlist"}</p>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          {products.map((product) => (
-            <div key={product._id} className="bg-white shadow-md rounded-lg overflow-hidden">
+          {products.map((product, i) => (
+            <div key={i} className="bg-white shadow-md rounded-lg overflow-hidden">
               <img
                 src={product.thumbnail}
                 alt={product.name}

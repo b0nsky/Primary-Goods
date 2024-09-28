@@ -1,4 +1,3 @@
-// route.ts (API Route)
 import { NextResponse } from 'next/server';
 import { Product } from '@/models/Product';
 

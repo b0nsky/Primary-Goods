@@ -55,8 +55,8 @@ const ProductSlider: React.FC<ProductSliderProps> = ({ products }) => {
           className="flex transition-transform duration-300 ease-in-out"
           style={{ transform: `translateX(-${(currentIndex / 5) * 100}%)` }}
         >
-          {displayedProducts.map((product) => (
-            <div key={product.id} className="min-w-[20%] p-4">
+          {displayedProducts.map((product, i) => (
+            <div key={i} className="min-w-[20%] p-4">
               <div className="bg-white shadow-md rounded-lg p-4 h-full flex flex-col justify-between">
                 {product.thumbnail ? (
                   <img

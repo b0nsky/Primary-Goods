@@ -15,7 +15,7 @@ interface Product {
 
 const getProductBySlug = async (slug: string): Promise<Product | null> => {
   try {
-    const res = await fetch(`http://localhost:3000/api/products/${slug}`);
+    const res = await fetch(`${process.env.NEXT_PUBLIC_BASE_URL}/api/products/${slug}`);
 
     if (!res.ok) {
       console.error('Failed to fetch product:', res.statusText);

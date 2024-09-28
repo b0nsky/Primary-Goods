@@ -61,7 +61,7 @@ const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId, userId: initia
 
       setAddedToWishlist(true);
       toast.success('Added to wishlist');
-    } catch (error) {
+    } catch {
       toast.error('Something went wrong');
     }
   };

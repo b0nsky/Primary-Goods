@@ -49,7 +49,7 @@ const RegisterPage = () => {
           });
         }
       }
-    } catch (error) {
+    } catch {
       toast.error('An unexpected error occurred', {
         style: { backgroundColor: 'red', color: 'white' },
       });

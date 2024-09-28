@@ -1,4 +1,3 @@
-require('dotenv').config();
 import { MongoClient } from 'mongodb';
 
 console.log('MongoDB URI:', process.env.MONGO_DB);

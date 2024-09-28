@@ -5,7 +5,8 @@ interface Product {
     id: number;
     name: string;
     price: number | string;
-    thumbnail: string;
+    thumbnail?: string;
+    slug: string;
 }
 
 interface FeaturedProductProps {
@@ -13,13 +14,11 @@ interface FeaturedProductProps {
 }
 
 const FeaturedProduct: React.FC<FeaturedProductProps> = ({ products }) => {
-
     return (
         <div className="overflow-hidden">
             <ProductSlider products={products} />
         </div>
     );
 };
-
 
 export default FeaturedProduct;

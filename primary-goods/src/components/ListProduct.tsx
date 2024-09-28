@@ -35,9 +35,9 @@ const ListProduct: React.FC<ListProductProps> = ({ products, hasMore, loadMorePr
       endMessage={<div className="col-span-full text-center">No more products</div>}
       className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-6"
     >
-      {products.map((product) => (
+      {products.map((product, i) => (
         <div
-          key={product._id.toString()}
+          key={i}
           className="bg-white shadow-md rounded-lg p-4 relative group"
         >
           <div className="relative">

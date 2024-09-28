@@ -44,7 +44,7 @@ const LoginPage = () => {
         setErrorMessage(data.error || 'Login failed');
         toast.error(data.error || 'Login failed');
       }
-    } catch (error) {
+    } catch {
       setErrorMessage('An unexpected error occurred');
       toast.error('An unexpected error occurred');
     } finally {
@@ -87,7 +87,7 @@ const LoginPage = () => {
         )}
 
         <p className="text-center text-gray-600 mt-6">
-          Don't have an account?{' '}
+          {"Don't have an account?"}{' '}
           <Link href="/register" className="text-blue-500 hover:text-blue-700 transition">
             Register
           </Link>

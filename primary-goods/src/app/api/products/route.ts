@@ -16,7 +16,7 @@ export async function GET(request: Request) {
     try {
         const products = await Product.findAll({ start, limit, query });
         return NextResponse.json(products);
-    } catch (error) {
+    } catch {
         return NextResponse.json({ error: 'Failed to fetch products' }, { status: 500 });
     }
 }

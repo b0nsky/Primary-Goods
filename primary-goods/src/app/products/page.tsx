@@ -21,9 +21,9 @@ const getProducts = async (page: number, limit: number, search: string): Promise
   return res.json();
 };
 
-const debounce = (func: Function, delay: number) => {
+const debounce = (func: (value: string) => void, delay: number) => {
   let timeoutId: NodeJS.Timeout;
-  return (...args: any[]) => {
+  return (...args: [string]) => {
     clearTimeout(timeoutId);
     timeoutId = setTimeout(() => func(...args), delay);
   };
