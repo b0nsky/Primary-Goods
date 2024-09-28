@@ -9,7 +9,7 @@ export async function POST(request: Request) {
   const user = await User.findOne(emailOrUsername);
 
   if (!user) {
-    return NextResponse.json({ error: 'Invalid Email / Password' }, { status: 404 })
+    return NextResponse.json({ error: 'Invalid Email / Password' }, { status: 404 });
   }
 
   const isPasswordValid = await compare(password, user.password);
@@ -19,5 +19,24 @@ export async function POST(request: Request) {
 
   const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET!, { expiresIn: '1h' });
 
-  return NextResponse.json({ token });
+  const response = NextResponse.json({
+    success: true,
+    message: 'Login successful',
+    token, 
+    user: {
+      id: user._id,
+      email: user.email,
+      username: user.username,
+    },
+  });
+
+  response.cookies.set('token', token, {
+    httpOnly: false,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'strict',
+    path: '/',
+    maxAge: 60 * 60,
+  });
+
+  return response;
 }

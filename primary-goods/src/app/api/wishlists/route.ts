@@ -2,13 +2,30 @@ import { NextResponse } from 'next/server';
 import { Wishlist } from '@/models/Wishlist';
 import { Product } from '@/models/Product';
 import { ObjectId } from 'mongodb';
+import jwt from 'jsonwebtoken';
+
+const verifyToken = (request: Request): string | null => {
+  const tokenCookie = request.headers.get('cookie')
+    ?.split('; ')
+    .find(cookie => cookie.startsWith('token='));
+
+  if (!tokenCookie) return null;
+
+  const token = tokenCookie.split('=')[1];
+  try {
+    const decoded = jwt.verify(token, process.env.JWT_SECRET!);
+    return (decoded as { userId: string }).userId;
+  } catch (error) {
+    console.error('Invalid token:', error);
+    return null;
+  }
+};
 
 export async function GET(request: Request) {
-  const { searchParams } = new URL(request.url);
-  const userId = searchParams.get('userId');
+  const userId = verifyToken(request);
 
   if (!userId) {
-    return NextResponse.json({ error: 'UserId is required' }, { status: 400 });
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
   }
 
   try {
@@ -29,7 +46,9 @@ export async function GET(request: Request) {
 }
 
 export async function POST(request: Request) {
-  const { userId, productId } = await request.json();
+  const { productId } = await request.json();
+  
+  const userId = verifyToken(request);
 
   if (!userId || !productId) {
     return NextResponse.json({ error: 'UserId and ProductId are required' }, { status: 400 });
@@ -54,7 +73,9 @@ export async function POST(request: Request) {
 }
 
 export async function DELETE(request: Request) {
-  const { userId, productId } = await request.json();
+  const { productId } = await request.json();
+  
+  const userId = verifyToken(request);
 
   if (!userId || !productId) {
     return NextResponse.json({ error: 'UserId and ProductId are required' }, { status: 400 });

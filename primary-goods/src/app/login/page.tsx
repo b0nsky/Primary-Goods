@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
@@ -28,19 +28,19 @@ const LoginPage = () => {
         body: JSON.stringify({ emailOrUsername, password }),
       });
 
-      const data = await res.json();
-
-      if (res.ok && data.token) {
-        localStorage.setItem('token', data.token);
-
+      if (res.ok) {
         toast.success('Login successful!', {
           style: { backgroundColor: 'green', color: 'white' },
         });
 
         setTimeout(() => {
           router.push('/');
+          setTimeout(() => {
+            window.location.reload();
+          }, 100);
         }, 2000);
       } else {
+        const data = await res.json();
         setErrorMessage(data.error || 'Login failed');
         toast.error(data.error || 'Login failed');
       }

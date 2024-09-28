@@ -6,8 +6,15 @@ const Navbar = () => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const router = useRouter();
 
+  const getTokenFromCookies = (): string | null => {
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='));
+    return tokenCookie ? tokenCookie.split('=')[1] : null;
+  };
+
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = getTokenFromCookies();
     if (token) {
       setIsLoggedIn(true);
     } else {
@@ -16,7 +23,7 @@ const Navbar = () => {
   }, []);
 
   const handleLogout = () => {
-    localStorage.removeItem("token");
+    document.cookie = 'token=; Max-Age=0; path=/';
     setIsLoggedIn(false);
     router.push("/login");
   };

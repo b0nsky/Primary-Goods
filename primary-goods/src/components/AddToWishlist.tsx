@@ -1,6 +1,5 @@
 "use client";
 
-import { jwtDecode } from 'jwt-decode';
 import React, { useState, useEffect } from 'react';
 import { AiFillStar } from 'react-icons/ai';
 import { toast } from 'react-toastify';
@@ -18,12 +17,19 @@ const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId, userId: initia
   const [addedToWishlist, setAddedToWishlist] = useState(false);
   const [userId, setUserId] = useState<string | null>(initialUserId || null);
 
+  const getTokenFromCookies = (): string | null => {
+    const tokenCookie = document.cookie
+      .split('; ')
+      .find(row => row.startsWith('token='));
+    return tokenCookie ? tokenCookie.split('=')[1] : null;
+  };
+
   useEffect(() => {
     if (!userId) {
-      const token = localStorage.getItem('token');
+      const token = getTokenFromCookies();
       if (token) {
         try {
-          const decoded: DecodedToken = jwtDecode(token);
+          const decoded: DecodedToken = JSON.parse(atob(token.split('.')[1]));
           setUserId(decoded.userId);
         } catch (error) {
           console.error('Failed to decode token', error);
@@ -62,9 +68,12 @@ const AddToWishlist: React.FC<AddToWishlistProps> = ({ productId, userId: initia
 
   return (
     <button
-      className="bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300"
+      className={`bg-yellow-500 text-white p-1 rounded-full transition-opacity duration-300 ${
+        !userId ? 'opacity-50 cursor-not-allowed' : ''
+      }`}
       aria-label="Add to Wishlist"
-      onClick={handleWishlist}
+      onClick={userId ? handleWishlist : () => toast.error('Please log in to add to wishlist')}
+      disabled={!userId}
     >
       <AiFillStar className={`w-5 h-5 ${addedToWishlist ? 'text-yellow-300' : ''}`} />
     </button>

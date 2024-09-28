@@ -1,12 +1,13 @@
 import React from 'react';
+import { toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 interface RemoveWishlistProps {
-  userId: string;
   productId: string;
   onRemove: () => void;
 }
 
-const RemoveWishlist: React.FC<RemoveWishlistProps> = ({ userId, productId, onRemove }) => {
+const RemoveWishlist: React.FC<RemoveWishlistProps> = ({ productId, onRemove }) => {
   const handleRemove = async () => {
     try {
       const response = await fetch('/api/wishlists', {
@@ -14,16 +15,18 @@ const RemoveWishlist: React.FC<RemoveWishlistProps> = ({ userId, productId, onRe
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ userId, productId }),
+        body: JSON.stringify({ productId }),
       });
 
       if (!response.ok) {
         throw new Error('Failed to remove from wishlist');
       }
 
+      toast.success('Item removed from wishlist!');
       onRemove();
     } catch (error) {
-      console.error(error);
+      toast.error('Failed to remove item from wishlist');
+      console.error('Error removing from wishlist:', error);
     }
   };
 
